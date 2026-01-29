@@ -1,3 +1,4 @@
+/* 1. 폰트 임포트 (반드시 첫 줄!) */
 @import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Pacifico&family=Grandstander:wght@400;900&display=swap');
 
 @tailwind base;
@@ -6,8 +7,7 @@
 
 :root {
   --lemon-bg: #f7fee7;
-  --metal-gray: #94a3b8; /* 메탈릭 그레이 색상 */
-  --metal-dark: #475569;
+  --metal-gray: #94a3b8; /* ✅ 메탈 그레이 색상 */
 }
 
 body {
@@ -16,30 +16,25 @@ body {
   font-family: 'Grandstander', cursive;
 }
 
+/* 픽셀 패턴 배경 */
 .bg-clover-pixel {
   background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 1h2v1h1v1h1v2H7v1H6v1H4V7H3V6H2V4h1V3h1V1z' fill='%2384cc16' opacity='0.08'/%3E%3C/svg%3E");
 }
 
-/* ✅ ARKIV 로고: 요청하신 메탈 그레이 아웃라인 디자인 */
+/* ✅ ARKIV 로고: 요청하신 메탈 그레이 아웃라인 적용 */
 .arkiv-logo-metal {
   font-family: 'Shrikhand', cursive;
-  background: linear-gradient(to bottom, #ffffff 0%, #dcfce7 45%, #4ade80 50%, #22c55e 55%, #bbf7d0 100%);
+  background: linear-gradient(to bottom, #ffffff 0%, #4ade80 50%, #22c55e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
   
-  /* 메탈 그레이 아웃라인: 4방향 그림자로 선명한 테두리 구현 */
+  /* 메탈 그레이 테두리 (4방향 드롭 섀도우) */
   filter: 
-    drop-shadow(1.5px 1.5px 0px var(--metal-gray)) 
-    drop-shadow(-1.5px -1.5px 0px var(--metal-gray))
-    drop-shadow(1.5px -1.5px 0px var(--metal-gray))
-    drop-shadow(-1.5px 1.5px 0px var(--metal-gray))
-    drop-shadow(0px 8px 0px rgba(0,0,0,0.15)); /* 하단 3D 그림자 */
-}
-
-.script-lucky {
-  font-family: 'Pacifico', cursive;
-  color: #f97316;
-  text-shadow: 2px 2px 0px #ffffff;
+    drop-shadow(2px 2px 0px var(--metal-gray)) 
+    drop-shadow(-2px -2px 0px var(--metal-gray))
+    drop-shadow(2px -2px 0px var(--metal-gray))
+    drop-shadow(-2px 2px 0px var(--metal-gray))
+    drop-shadow(0px 6px 0px rgba(0,0,0,0.1));
 }
