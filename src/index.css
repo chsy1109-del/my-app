@@ -1,10 +1,6 @@
 /* 1. 폰트 임포트는 반드시 첫 줄! */
 @import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Pacifico&family=Grandstander:wght@400;900&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   --lemon-bg: #f7fee7;
   --metal-gray: #94a3b8; /* ✅ 요청하신 메탈 그레이 색상 */
