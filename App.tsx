@@ -1,99 +1,73 @@
 import React, { useState, useEffect } from 'react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
-import { Plane, ArrowRight, Download } from 'lucide-react';
-
-import { Place, TripMetadata } from './types';
+import { db } from './services/firebase';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import DayColumn from './components/DayColumn';
-import { ReceiptModal } from './components/ReceiptModal';
-import { extractPlaceInfo } from './services/geminiService';
-
-const STORAGE_KEY = 'arkiv_v10_storage';
-const META_KEY = 'arkiv_v10_meta';
+import { AddPlaceModal } from './components/AddPlaceModal';
+import { CurrencyConverter } from './components/CurrencyConverter';
 
 export default function App() {
-  const [places, setPlaces] = useState<Place[]>([]);
-  const [meta, setMeta] = useState<TripMetadata | null>(null);
-  const [isLaunched, setIsLaunched] = useState(false);
-  const [showReceipt, setShowReceipt] = useState(false);
-  const [tempDest, setTempDest] = useState('');
+  const [places, setPlaces] = useState<any[]>([]);
+  const [meta, setMeta] = useState<any>(null);
+  const [activeDay, setActiveDay] = useState<number | null>(null);
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+
+  // 🔗 공유 기능: URL에 tripId가 있으면 해당 방으로 접속, 없으면 기본값(fukuoka) 사용
+  const tripId = new URLSearchParams(window.location.search).get('tripId') || 'lucky-fukuoka-trip';
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const savedMeta = localStorage.getItem(META_KEY);
-    if (saved) setPlaces(JSON.parse(saved));
-    if (savedMeta) {
-      setMeta(JSON.parse(savedMeta));
-      setIsLaunched(true);
-    }
-  }, []);
+    const unsub = onSnapshot(doc(db, "trips", tripId), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setPlaces(data.places || []);
+        setMeta(data.meta || { destination: 'FUKUOKA', duration: 3 });
+      }
+    });
+    return () => unsub();
+  }, [tripId]);
 
-  useEffect(() => {
-    if (meta) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(places));
-      localStorage.setItem(META_KEY, JSON.stringify(meta));
-    }
-  }, [places, meta]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      const oldIndex = places.findIndex(i => i.id === active.id);
-      const newIndex = places.findIndex(i => i.id === over.id);
-      const overItem = places.find(i => i.id === over.id);
-      const updated = arrayMove(places, oldIndex, newIndex);
-      setPlaces(updated.map(p => p.id === active.id ? { ...p, day: overItem?.day || p.day } : p));
-    }
+  const syncData = async (newPlaces: any) => {
+    await setDoc(doc(db, "trips", tripId), { places: newPlaces, meta }, { merge: true });
   };
-
-  const updateMemo = (id: string, field: keyof Place, value: any) => setPlaces(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
-
-  if (!isLaunched) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-clover-pixel">
-        <div className="w-full max-w-5xl flex flex-col items-center gap-8 z-10">
-          <div className="relative mb-12">
-            <div className="script-overlay font-script">Lucky</div>
-            <h1 className="text-[10rem] arkiv-logo-3d leading-none">ARKIV</h1>
-            <p className="text-orange-500 text-xs tracking-[1em] uppercase font-bubbly font-black text-center -mt-2">MEMORIES ARCHIVE</p>
-          </div>
-          <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-4xl bg-white/60 p-12 rounded-[4rem] border-8 border-white shadow-2xl">
-             <div className="w-40 h-40 rounded-[2.5rem] aircraft-icon-container flex items-center justify-center text-white animate-float"><Plane size={60} /></div>
-             <form onSubmit={e => { e.preventDefault(); setMeta({ destination: tempDest, duration: 3 }); setIsLaunched(true); }} className="flex-1 space-y-6">
-                <input required placeholder="TARGET DESTINATION..." className="w-full bg-transparent border-b-4 border-green-200 py-4 text-3xl font-retro outline-none focus:border-green-400" value={tempDest} onChange={e => setTempDest(e.target.value)} />
-                <button className="bg-[#4ade80] hover:bg-green-500 text-white font-black px-12 py-5 rounded-full text-xl flex items-center gap-2 shadow-lg transition-all">LAUNCH <ArrowRight size={20} /></button>
-             </form>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col font-bubbly bg-clover-pixel">
-      <header className="px-10 py-5 flex items-center justify-between sticky top-0 z-[100] glass-light">
-        <div className="flex items-center gap-8" onClick={() => setIsLaunched(false)}>
-          <h2 className="text-3xl arkiv-logo-3d">ARKIV</h2>
-          <div className="border-l-2 border-green-200 pl-8"><h1 className="text-xl font-retro text-orange-500 uppercase">{meta?.destination}</h1></div>
+      {/* 🌸 상단 헤더: 메탈릭 핑크 라인 적용 */}
+      <header className="px-10 py-5 flex items-center justify-between glass-light sticky top-0 z-[100] border-b-[3px] border-[#fbcfe8]">
+        <div className="flex items-center gap-8">
+          <h1 className="text-3xl font-retro arkiv-logo-3d">ARKIV</h1>
+          <div className="border-l-2 border-[#fbcfe8] pl-8 font-retro text-orange-500 text-xl">{meta?.destination}</div>
         </div>
-        <div className="flex gap-4">
-          <button onClick={() => setShowReceipt(true)} className="px-6 py-2 border-2 border-green-500 text-green-500 rounded-full font-bold text-xs">RECEIPT</button>
-          <button onClick={() => window.print()} className="bg-orange-400 text-white font-black px-8 py-2 rounded-full text-xs shadow-md flex items-center gap-2"><Download size={14} /> EXPORT</button>
+        <div className="flex gap-3">
+          <button onClick={() => setIsCurrencyOpen(true)} className="px-5 py-2 bg-white text-green-600 rounded-full text-[10px] font-black border-2 border-[#fbcfe8] hover:bg-pink-50 transition-all">EXCHANGE</button>
+          <button onClick={() => {
+            const shareUrl = `${window.location.origin}${window.location.pathname}?tripId=${tripId}`;
+            navigator.clipboard.writeText(shareUrl);
+            alert("공유 링크가 복사되었습니다! 친구에게 보내주세요. 🍀");
+          }} className="px-5 py-2 bg-pink-400 text-white rounded-full text-[10px] font-black border-2 border-white shadow-sm hover:bg-pink-500 transition-all">SHARE TRIP +</button>
         </div>
       </header>
-      <main className="flex-1 overflow-x-auto px-12 py-12 flex items-start gap-12">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          {Array.from({ length: meta?.duration || 0 }, (_, i) => i + 1).map(dayNum => (
-            <DayColumn key={dayNum} dayNum={dayNum} places={places.filter(p => p.day === dayNum)} updateMemo={updateMemo} addPlace={(day) => setPlaces([...places, { id: `pl-${Date.now()}`, name: 'New Place', day, visited: false, category: 'POINT', photos: [] }])} removePlace={(id) => setPlaces(prev => prev.filter(p => p.id !== id))} toggleVisited={(id) => setPlaces(prev => prev.map(p => p.id === id ? {...p, visited: !p.visited} : p))} />
-          ))}
-        </DndContext>
+
+      {/* 🗓️ 메인 타임라인 영역 */}
+      <main className="flex-1 overflow-x-auto p-12 flex items-start gap-12 custom-scrollbar">
+        {[1, 2, 3].map(day => (
+          <DayColumn 
+            key={day} dayNum={day} 
+            places={places.filter(p => p.day === day)} 
+            addPlace={(d: any) => setActiveDay(d)}
+            syncPlaces={(updated: any) => syncData(updated)}
+          />
+        ))}
       </main>
-      {showReceipt && <ReceiptModal places={places} homeCurrency="KRW" onClose={() => setShowReceipt(false)} />}
+
+      {/* ➕ 장소 추가 모달 (구글맵 연동) */}
+      {activeDay && <AddPlaceModal day={activeDay} onClose={() => setActiveDay(null)} onAdd={(newP: any) => {
+        const updated = [...places, { ...newP, id: Date.now(), day: activeDay, photos: [] }];
+        syncData(updated); 
+        setActiveDay(null);
+      }} />}
+      
+      {/* 💰 환율계산기 모달 */}
+      <CurrencyConverter isOpen={isCurrencyOpen} onClose={() => setIsCurrencyOpen(false)} />
     </div>
   );
 }
