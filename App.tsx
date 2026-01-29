@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './services/firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { Plane, ArrowRight, Share2, Download } from 'lucide-react';
+import { Plane, ArrowRight, Share2 } from 'lucide-react';
 
 import DayColumn from './components/DayColumn';
 import { AddPlaceModal } from './components/AddPlaceModal';
@@ -34,28 +34,28 @@ export default function App() {
     await setDoc(doc(db, "trips", tripId), { places: newPlaces, meta: newMeta || meta }, { merge: true });
   };
 
-  // 1번 페이지 디자인 복구
+  // 1번 페이지 디자인 복구 (image_e1ada4.png)
   if (!isLaunched) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-clover-pixel relative overflow-hidden">
-        <div className="absolute top-10 left-10 text-[8px] font-digital uppercase tracking-[0.5em] text-green-300 opacity-50">STUDIO: ARKIV</div>
-        <div className="absolute top-10 right-10 text-[8px] font-digital uppercase tracking-[0.5em] text-green-300 opacity-50">ARCHIVE: v10.0</div>
+      <div className="min-h-screen flex items-center justify-center p-6 bg-clover-pixel relative overflow-hidden" style={{backgroundColor: '#f7fee7'}}>
+        <div className="absolute top-10 left-10 text-[8px] font-digital uppercase tracking-[0.5em] text-green-300 opacity-50 font-bold">STUDIO: ARKIV</div>
+        <div className="absolute top-10 right-10 text-[8px] font-digital uppercase tracking-[0.5em] text-green-300 opacity-50 font-bold">ARCHIVE: v10.0</div>
         
         <div className="w-full max-w-5xl flex flex-col items-center gap-12 text-center z-10">
           <div className="relative mb-8">
-            <div className="script-overlay font-script" style={{ top: '-1.5rem', left: '0' }}>Lucky</div>
+            <div className="script-overlay font-script" style={{position: 'absolute', top: '-2rem', left: '50%', transform: 'translateX(-50%) rotate(-10deg)', fontSize: '4rem', color: '#f97316', zIndex: 20}}>Lucky</div>
             <h1 className="text-[10rem] arkiv-logo-3d leading-none">ARKIV</h1>
             <p className="text-orange-500 text-xs tracking-[1em] uppercase font-bubbly font-black -mt-4">MEMORIES ARCHIVE</p>
           </div>
           
           <div className="flex flex-col md:flex-row items-center gap-10 w-full max-w-4xl bg-white/40 p-12 rounded-[4rem] border-[8px] border-white shadow-2xl backdrop-blur-md">
-             <div className="w-44 h-44 rounded-[3rem] aircraft-icon-container flex items-center justify-center text-white animate-float flex-shrink-0">
+             <div className="w-44 h-44 rounded-[3rem] aircraft-icon-container flex items-center justify-center text-white animate-float flex-shrink-0" style={{background: 'linear-gradient(135deg, #84cc16 0%, #fbbf24 100%)'}}>
                 <Plane size={80} />
              </div>
              <form onSubmit={e => { e.preventDefault(); const m = { destination: tempDest, duration: 3 }; setMeta(m); setIsLaunched(true); syncData(places, m); }} className="flex-1 space-y-8 text-left">
-                <p className="font-bubbly text-green-600 text-sm uppercase tracking-widest leading-relaxed">FOR BOLD LOOKS, RETRO ROOTS. START YOUR LUCKY JOURNEY ARCHIVE BELOW.</p>
+                <p className="font-bubbly text-green-600 text-sm uppercase tracking-widest leading-relaxed font-bold">FOR BOLD LOOKS, RETRO ROOTS. START YOUR LUCKY JOURNEY ARCHIVE BELOW.</p>
                 <input required placeholder="TARGET DESTINATION..." className="w-full bg-white/60 border-b-4 border-green-200 py-4 px-6 rounded-full text-3xl font-retro outline-none focus:border-green-400 shadow-sm" value={tempDest} onChange={e => setTempDest(e.target.value)} />
-                <button className="bg-[#4ade80] text-white font-black px-12 py-5 rounded-full text-xl flex items-center gap-3 hover:bg-green-500 transition-all shadow-lg active:scale-95 uppercase tracking-widest">LAUNCH <ArrowRight /></button>
+                <button className="bg-[#4ade80] text-white font-black px-12 py-5 rounded-full text-xl flex items-center gap-3 shadow-lg active:scale-95 uppercase tracking-widest">LAUNCH <ArrowRight /></button>
              </form>
           </div>
         </div>
@@ -64,8 +64,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col font-bubbly bg-clover-pixel">
-      {/* 3번: EXCHANGE 버튼 우측 상단 복구 */}
+    <div className="min-h-screen flex flex-col font-bubbly bg-clover-pixel" style={{backgroundColor: '#f7fee7'}}>
       <header className="px-10 py-6 flex items-center justify-between sticky top-0 z-[100] glass-light border-b-[3px] border-[#fbcfe8]">
         <div className="flex items-center gap-8 cursor-pointer" onClick={() => setIsLaunched(false)}>
           <h2 className="text-3xl arkiv-logo-3d">ARKIV</h2>
@@ -79,7 +78,7 @@ export default function App() {
       </header>
       
       <main className="flex-1 overflow-x-auto p-12 flex items-start gap-12 custom-scrollbar">
-        {Array.from({ length: meta?.duration || 3 }, (_, i) => i + 1).map(day => (
+        {[1, 2, 3].map(day => (
           <DayColumn key={day} dayNum={day} places={places.filter(p => p.day === day)} addPlace={(d: any) => setActiveDay(d)} toggleVisited={(id: any) => { const u = places.map(p => p.id === id ? {...p, visited: !p.visited} : p); setPlaces(u); syncData(u); }} updateMemo={(id: any, f: any, v: any) => { const u = places.map(p => p.id === id ? {...p, [f]: v} : p); setPlaces(u); syncData(u); }} removePlace={(id: any) => { const u = places.filter(p => p.id !== id); setPlaces(u); syncData(u); }} />
         ))}
       </main>
