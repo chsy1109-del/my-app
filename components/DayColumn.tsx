@@ -1,7 +1,7 @@
 import React from 'react';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus, Sparkles } from 'lucide-react';
-import { PlaceCard } from './PlaceCard';
+import { PlaceCard } from 'PlaceCard.tsx';
 
 export default function DayColumn({ dayNum, places, addPlace, toggleVisited, updateMemo, removePlace }: any) {
   return (
