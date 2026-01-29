@@ -1,72 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARKIV | Digital Memory Archive</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Grandstander:ital,wght@0,100..900;1,100..900&family=Shrikhand&family=Courier+Prime:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --arkiv-green: #22c55e;
-            --arkiv-orange: #f97316;
-            --arkiv-lemon: rgba(247, 254, 231, 0.85);
-            --arkiv-pink-border: #fbcfe8;
-        }
-        body {
-            font-family: 'Grandstander', cursive;
-            background-color: #f7fee7;
-            color: #166534;
-            margin: 0;
-            overflow-x: hidden;
-            min-height: 100vh;
-        }
-        .font-retro { font-family: 'Shrikhand', cursive; }
-        .font-script { font-family: 'Pacifico', cursive; }
-        .font-digital { font-family: 'Courier Prime', monospace; font-weight: 700; }
-        .arkiv-logo-3d {
-            font-family: 'Shrikhand', cursive;
-            background: linear-gradient(to bottom, #ffffff 0%, #dcfce7 45%, #4ade80 50%, #22c55e 55%, #bbf7d0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 2px 0 rgba(251, 207, 232, 0.8));
-            display: inline-block;
-        }
-        .script-overlay {
-            position: absolute;
-            top: -2.5rem;
-            left: 50%;
-            transform: translateX(-50%) rotate(-5deg);
-            z-index: 20;
-            color: #f97316;
-            font-size: 5rem;
-            text-shadow: 2px 2px 0px #ffffff;
-        }
-        .aircraft-icon-container {
-            background: linear-gradient(135deg, #84cc16 0%, #fbbf24 100%);
-            border: 2px solid #ffffff;
-            box-shadow: 0 8px 20px rgba(132, 204, 22, 0.15);
-        }
-        .glass-light {
-            background: var(--arkiv-lemon);
-            backdrop-filter: blur(12px);
-            border-bottom: 2px solid var(--arkiv-pink-border);
-        }
-        .bg-clover-pixel {
-            background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 1h2v1h1v1h1v2H7v1H6v1H4V7H3V6H2V4h1V3h1V1z' fill='%2384cc16' opacity='0.08'/%3E%3C/svg%3E");
-            background-repeat: repeat;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(1deg); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-    </style>
-</head>
-<body class="bg-clover-pixel">
-    <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
-</body>
-</html>
+<style>
+  .script-overlay {
+    position: absolute;
+    top: -2.2rem;
+    left: -1rem;
+    z-index: 20;
+    color: #f97316;
+    font-size: 4rem; /* 폰트 크기 대폭 확대 */
+    text-shadow: 3px 3px 0px #ffffff;
+    transform: rotate(-10deg); /* 이미지처럼 살짝 기울임 */
+    pointer-events: none;
+    font-family: 'Pacifico', cursive;
+  }
+  
+  .arkiv-logo-3d {
+    font-family: 'Shrikhand', cursive;
+    background: linear-gradient(to bottom, #ffffff 0%, #dcfce7 45%, #4ade80 50%, #22c55e 55%, #bbf7d0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 6px 0 rgba(251, 207, 232, 0.8)); /* 그림자 깊이 조절 */
+    display: inline-block;
+  }
+</style>
