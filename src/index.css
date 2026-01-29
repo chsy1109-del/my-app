@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 폰트 임포트: 로고(Shrikhand), 스크립트(Pacifico), 본문(Grandstander) */
+@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Pacifico&family=Grandstander:wght@400;900&display=swap');
+
+:root {
+  --lucky-green: #22c55e;
+  --lemon-bg: #f7fee7; /* 밝은 레몬 그린 배경색 */
+  --metallic-pink: #fbcfe8; /* 대시보드 테두리용 핑크 */
+  --silver-line: #cbd5e1; /* 실버 라인 색상 */
+  --black-line: #000000; /* 블랙 라인 색상 */
+}
+
+body {
+  background-color: var(--lemon-bg);
+  margin: 0;
+  font-family: 'Grandstander', cursive;
+  overflow-x: hidden;
+}
+
+/* 1. 클로버 픽셀 패턴 배경 */
+.bg-clover-pixel {
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 1h2v1h1v1h1v2H7v1H6v1H4V7H3V6H2V4h1V3h1V1z' fill='%2384cc16' opacity='0.08'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* 2. ARKIV 3D 로고 & 블랙 실버 라인 추가 */
+.arkiv-logo-3d {
+  font-family: 'Shrikhand', cursive;
+  background: linear-gradient(to bottom, #ffffff 0%, #dcfce7 45%, #4ade80 50%, #22c55e 55%, #bbf7d0 100%);
+  -webkit-background-clip: text;
+  background-clip: text; /* 표준 속성 추가로 경고 해결 */
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  
+  /* 블랙 실버 라인 효과: 여러 겹의 그림자로 두꺼운 테두리 구현 */
+  filter: 
+    drop-shadow(2px 2px 0px var(--black-line)) 
+    drop-shadow(-2px -2px 0px var(--black-line))
+    drop-shadow(2px -2px 0px var(--black-line))
+    drop-shadow(-2px 2px 0px var(--black-line))
+    drop-shadow(0px 6px 0px var(--metallic-pink)); /* 가장 아래 핑크색 3D 효과 */
+}
+
+/* 3. Lucky 오렌지 스크립트 오버레이 */
+.script-overlay {
+  font-family: 'Pacifico', cursive;
+  color: #f97316;
+  text-shadow: 2px 2px 0px #ffffff, 4px 4px 0px rgba(0,0,0,0.1);
+  z-index: 20;
+}
+
+/* 4. 메탈릭 핑크 대시보드 카드 */
+.lucky-card {
+  @apply bg-white/40 backdrop-blur-md rounded-[4rem] border-[6px] border-[#fbcfe8] shadow-2xl;
+}
+
+/* 5. 비행기 아이콘 컨테이너 그라데이션 */
+.aircraft-icon-container {
+  background: linear-gradient(135deg, #84cc16 0%, #fbbf24 100%);
+  @apply border-4 border-white shadow-xl;
+}
+
+/* 6. 커스텀 스크롤바 (핑크색 포인트) */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--metallic-pink);
+  border-radius: 10px;
+}
