@@ -1,32 +1,28 @@
 import React from 'react';
 
-export const ReceiptModal = ({ places, onClose, homeCurrency }) => {
-  const total = places.reduce((sum, p) => sum + (Number(p.cost || 0) * 9.2), 0); // 기본 환율 적용
+export const ReceiptModal = ({ places, onClose, homeCurrency }: any) => {
+  const total = places.reduce((sum: number, p: any) => sum + (Number(p.cost || 0)), 0);
 
   return (
-    <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-[#f4f1ea] w-full max-w-sm p-8 shadow-2xl relative overflow-hidden text-zinc-800">
-        <div className="absolute top-0 left-0 w-full h-1 bg-zinc-800 opacity-10" />
-        <button onClick={onClose} className="absolute top-4 right-4 text-xs tracking-widest uppercase opacity-40">CLOSE</button>
-        
-        <div className="text-center space-y-2 mb-10 border-b border-zinc-200 pb-8">
-          <h2 className="text-2xl font-serif italic tracking-tighter">Travel Ledger</h2>
-          <p className="text-[9px] uppercase tracking-[0.4em] opacity-40">Official Record of Moments</p>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[5000] flex items-center justify-center p-6">
+      <div className="bg-[#f4f1ea] w-full max-w-sm p-10 shadow-2xl rounded-sm text-zinc-800 font-mono">
+        <div className="text-center border-b-2 border-zinc-200 pb-6 mb-6">
+          <h2 className="text-2xl font-black italic">RECEIPT</h2>
+          <p className="text-[8px] tracking-widest opacity-40">ARKIV_OFFICIAL_RECORD</p>
         </div>
-
-        <div className="space-y-4 mb-10 font-mono text-sm">
-          {places.map((p, i) => (
-            <div key={i} className="flex justify-between items-end border-b border-zinc-100 border-dashed pb-2">
-              <span className="truncate pr-4 uppercase text-[10px]">{p.name || 'Untitled'}</span>
-              <span className="whitespace-nowrap">{Number(p.cost || 0).toLocaleString()}</span>
+        <div className="space-y-3 mb-8">
+          {places.map((p: any, i: number) => (
+            <div key={i} className="flex justify-between text-xs">
+              <span>{p.name}</span>
+              <span>{p.cost}</span>
             </div>
           ))}
         </div>
-
-        <div className="pt-6 border-t-2 border-zinc-800 space-y-1 text-right">
-          <p className="text-[8px] uppercase tracking-[0.2em] opacity-50">Grand Total ({homeCurrency})</p>
-          <p className="text-3xl font-serif italic">₩ {total.toLocaleString()}</p>
+        <div className="border-t-2 border-zinc-800 pt-4 flex justify-between font-bold">
+          <span>TOTAL ({homeCurrency})</span>
+          <span>{total.toLocaleString()}</span>
         </div>
+        <button onClick={onClose} className="w-full mt-10 py-3 bg-zinc-800 text-white text-xs font-bold uppercase">Close</button>
       </div>
     </div>
   );

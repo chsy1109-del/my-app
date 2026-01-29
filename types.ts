@@ -1,14 +1,13 @@
-
 export interface Place {
   id: string;
   name: string;
   day: number;
   visited: boolean;
-  transport: string;
-  cost: string;
-  description: string;
-  category?: string;
-  photos?: string[];
+  transport?: string;
+  cost?: string;
+  description?: string;
+  category: string;
+  photos: string[];
   musicLink?: string;
 }
 

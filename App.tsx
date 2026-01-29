@@ -1,123 +1,99 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { db } from './services/firebase'; 
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { PlaceCard } from './components/PlaceCard.tsx';
-import { ReceiptModal } from './components/ReceiptModal.tsx';
+import React, { useState, useEffect } from 'react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { Plane, ArrowRight, Download } from 'lucide-react';
+
+import { Place, TripMetadata } from './types';
+import DayColumn from './components/DayColumn';
+import { ReceiptModal } from './components/ReceiptModal';
+import { extractPlaceInfo } from './services/geminiService';
+
+const STORAGE_KEY = 'arkiv_v10_storage';
+const META_KEY = 'arkiv_v10_meta';
 
 export default function App() {
+  const [places, setPlaces] = useState<Place[]>([]);
+  const [meta, setMeta] = useState<TripMetadata | null>(null);
   const [isLaunched, setIsLaunched] = useState(false);
-  const [places, setPlaces] = useState<any[]>([]);
-  const [dayTitles, setDayTitles] = useState<any>({ 1: "HAKATA", 2: "TENJIN", 3: "DAZAIFU" });
   const [showReceipt, setShowReceipt] = useState(false);
-  const [globalSettings, setGlobalSettings] = useState({ home: 'KRW', target: 'JPY' });
-
-  const tripId = new URLSearchParams(window.location.search).get('tripId') || 'lucky-trip-01';
+  const [tempDest, setTempDest] = useState('');
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, "trips", tripId), (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        setPlaces(data.places || []);
-        setDayTitles(data.dayTitles || { 1: "HAKATA", 2: "TENJIN", 3: "DAZAIFU" });
-        setGlobalSettings(data.settings || { home: 'KRW', target: 'JPY' });
-      }
-    });
-    return () => unsub();
-  }, [tripId]);
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const savedMeta = localStorage.getItem(META_KEY);
+    if (saved) setPlaces(JSON.parse(saved));
+    if (savedMeta) {
+      setMeta(JSON.parse(savedMeta));
+      setIsLaunched(true);
+    }
+  }, []);
 
-  const syncData = async (updatedPlaces: any, updatedTitles: any, updatedSettings: any) => {
-    await setDoc(doc(db, "trips", tripId), { 
-      places: updatedPlaces || places, 
-      dayTitles: updatedTitles || dayTitles,
-      settings: updatedSettings || globalSettings
-    }, { merge: true });
+  useEffect(() => {
+    if (meta) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(places));
+      localStorage.setItem(META_KEY, JSON.stringify(meta));
+    }
+  }, [places, meta]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = places.findIndex(i => i.id === active.id);
+      const newIndex = places.findIndex(i => i.id === over.id);
+      const overItem = places.find(i => i.id === over.id);
+      const updated = arrayMove(places, oldIndex, newIndex);
+      setPlaces(updated.map(p => p.id === active.id ? { ...p, day: overItem?.day || p.day } : p));
+    }
   };
 
-  const totalCost = useMemo(() => {
-    return places.reduce((sum, p) => sum + Number(p.cost || 0), 0);
-  }, [places]);
+  const updateMemo = (id: string, field: keyof Place, value: any) => setPlaces(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
 
   if (!isLaunched) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#f4f7ed]">
-        <div className="relative mb-16 text-center">
-          <span className="lucky-script absolute -top-12 left-1/2 -translate-x-1/2 text-5xl text-orange-400">Lucky</span>
-          <h1 className="text-[8rem] md:text-[12rem] font-black tracking-tighter text-[#5bb381] leading-none opacity-80">ARKIV</h1>
-          <p className="text-[10px] tracking-[0.8em] font-bold text-[#5bb381]/40 mt-4 uppercase">Memories Archive</p>
-        </div>
-        
-        <div className="lucky-card p-10 w-full max-w-md text-center bg-white/40 backdrop-blur-md rounded-[3rem] border-8 border-white shadow-2xl">
-          <p className="text-[10px] tracking-widest text-zinc-400 mb-8 uppercase font-bold">Start Your Lucky Journey Below.</p>
-          <div className="border-b-2 border-dashed border-zinc-200 mb-10 pb-4">
-            <input 
-              placeholder="TARGET DESTINATION..." 
-              className="w-full bg-transparent text-center text-2xl font-black outline-none text-[#5bb381] placeholder:text-zinc-200"
-            />
+      <div className="min-h-screen flex items-center justify-center p-6 bg-clover-pixel">
+        <div className="w-full max-w-5xl flex flex-col items-center gap-8 z-10">
+          <div className="relative mb-12">
+            <div className="script-overlay font-script">Lucky</div>
+            <h1 className="text-[10rem] arkiv-logo-3d leading-none">ARKIV</h1>
+            <p className="text-orange-500 text-xs tracking-[1em] uppercase font-bubbly font-black text-center -mt-2">MEMORIES ARCHIVE</p>
           </div>
-          <button onClick={() => setIsLaunched(true)} className="launch-button w-full text-xl py-5 bg-[#5bb381] text-white rounded-full font-black tracking-widest shadow-lg hover:bg-[#4a966b] transition-all">LAUNCH →</button>
+          <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-4xl bg-white/60 p-12 rounded-[4rem] border-8 border-white shadow-2xl">
+             <div className="w-40 h-40 rounded-[2.5rem] aircraft-icon-container flex items-center justify-center text-white animate-float"><Plane size={60} /></div>
+             <form onSubmit={e => { e.preventDefault(); setMeta({ destination: tempDest, duration: 3 }); setIsLaunched(true); }} className="flex-1 space-y-6">
+                <input required placeholder="TARGET DESTINATION..." className="w-full bg-transparent border-b-4 border-green-200 py-4 text-3xl font-retro outline-none focus:border-green-400" value={tempDest} onChange={e => setTempDest(e.target.value)} />
+                <button className="bg-[#4ade80] hover:bg-green-500 text-white font-black px-12 py-5 rounded-full text-xl flex items-center gap-2 shadow-lg transition-all">LAUNCH <ArrowRight size={20} /></button>
+             </form>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-12 max-w-7xl mx-auto bg-[#f4f7ed]">
-      <header className="flex justify-between items-start mb-20">
-        <div>
-          <span className="text-[10px] font-bold text-orange-400 tracking-widest">@LUCKY_STUDIO</span>
-          <h1 className="text-4xl font-black text-[#5bb381] tracking-tighter">ARKIV</h1>
+    <div className="min-h-screen flex flex-col font-bubbly bg-clover-pixel">
+      <header className="px-10 py-5 flex items-center justify-between sticky top-0 z-[100] glass-light">
+        <div className="flex items-center gap-8" onClick={() => setIsLaunched(false)}>
+          <h2 className="text-3xl arkiv-logo-3d">ARKIV</h2>
+          <div className="border-l-2 border-green-200 pl-8"><h1 className="text-xl font-retro text-orange-500 uppercase">{meta?.destination}</h1></div>
         </div>
-        <div className="flex gap-3">
-          <button onClick={() => setShowReceipt(true)} className="px-6 py-2 border-2 border-[#5bb381] text-[#5bb381] rounded-full text-[10px] font-bold tracking-widest hover:bg-[#5bb381] hover:text-white transition">RECEIPT</button>
-          <button className="px-6 py-2 bg-orange-400 text-white rounded-full text-[10px] font-bold tracking-widest shadow-lg">SHARE +</button>
+        <div className="flex gap-4">
+          <button onClick={() => setShowReceipt(true)} className="px-6 py-2 border-2 border-green-500 text-green-500 rounded-full font-bold text-xs">RECEIPT</button>
+          <button onClick={() => window.print()} className="bg-orange-400 text-white font-black px-8 py-2 rounded-full text-xs shadow-md flex items-center gap-2"><Download size={14} /> EXPORT</button>
         </div>
       </header>
-
-      <main className="grid grid-cols-1 md:grid-cols-3 gap-10">
-        {[1, 2, 3].map(day => (
-          <div key={day} className="lucky-card p-8 min-h-[500px] flex flex-col items-center relative overflow-hidden bg-white/40 backdrop-blur-md rounded-[3rem] border-8 border-white shadow-2xl">
-            <div className="absolute top-6 left-6 text-[8px] font-bold tracking-[0.3em] opacity-20 uppercase">Timeline_Log / Reel_{day}</div>
-            <div className="text-[10rem] font-black italic text-[#5bb381]/5 absolute top-10 pointer-events-none">D{day}</div>
-            
-            <input 
-              value={dayTitles[day] || ""} 
-              onChange={(e) => {
-                const newTitles = { ...dayTitles, [day]: e.target.value };
-                setDayTitles(newTitles);
-                syncData(null, newTitles, null);
-              }}
-              className="mt-20 mb-10 bg-transparent text-center text-4xl font-black italic text-[#5bb381] outline-none w-full"
-            />
-
-            <div className="w-full space-y-6 z-10">
-              {places.filter(p => p.day === day).map(place => (
-                <PlaceCard 
-                  key={place.id} 
-                  place={place} 
-                  homeCurrency={globalSettings.home}
-                  onUpdate={(updated: any) => {
-                    const newPlaces = places.map(p => p.id === place.id ? updated : p);
-                    setPlaces(newPlaces);
-                    syncData(newPlaces, null, null);
-                  }} 
-                />
-              ))}
-            </div>
-
-            <button className="mt-auto w-16 h-16 bg-[#5bb381] text-white rounded-full text-4xl shadow-xl hover:scale-110 transition-transform">+</button>
-          </div>
-        ))}
+      <main className="flex-1 overflow-x-auto px-12 py-12 flex items-start gap-12">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          {Array.from({ length: meta?.duration || 0 }, (_, i) => i + 1).map(dayNum => (
+            <DayColumn key={dayNum} dayNum={dayNum} places={places.filter(p => p.day === dayNum)} updateMemo={updateMemo} addPlace={(day) => setPlaces([...places, { id: `pl-${Date.now()}`, name: 'New Place', day, visited: false, category: 'POINT', photos: [] }])} removePlace={(id) => setPlaces(prev => prev.filter(p => p.id !== id))} toggleVisited={(id) => setPlaces(prev => prev.map(p => p.id === id ? {...p, visited: !p.visited} : p))} />
+          ))}
+        </DndContext>
       </main>
-
-      <footer className="mt-20 border-t-4 border-white pt-10 flex justify-between items-center opacity-30">
-        <div className="text-[10px] font-bold tracking-[0.5em]">STABILITY METER</div>
-        <div className="w-64 h-2 bg-white rounded-full overflow-hidden">
-          <div className="w-1/2 h-full bg-[#5bb381]"></div>
-        </div>
-        <div className="text-[10px] font-bold tracking-[0.5em]">ARKIV V10.0 • RETRO ROOTS</div>
-      </footer>
-
-      {showReceipt && <ReceiptModal places={places} homeCurrency={globalSettings.home} onClose={() => setShowReceipt(false)} />}
+      {showReceipt && <ReceiptModal places={places} homeCurrency="KRW" onClose={() => setShowReceipt(false)} />}
     </div>
   );
 }
