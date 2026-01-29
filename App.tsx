@@ -1,3 +1,8 @@
+// App.tsx 최상단에 이 줄들이 있는지 꼭 확인하세요!
+import DayColumn from './components/DayColumn'; 
+import { AddPlaceModal } from './components/AddPlaceModal';
+import { CurrencyConverter } from './components/CurrencyConverter';
+// ReceiptModal은 이미 내부에 정의되어 있으니 임포트 안 해도 됩니다.
 import React, { useState, useEffect } from 'react';
 import { db } from './services/firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
