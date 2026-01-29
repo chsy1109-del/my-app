@@ -1,56 +1,51 @@
-/* 1. 반드시 @import가 맨 위에 와야 합니다! */
-@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Pacifico&family=Grandstander:wght@400;900&display=swap');
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lucky ARKIV - Memories Archive</title>
 
-/* 2. 그 다음 테일윈드 설정 */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Pacifico&family=Grandstander:wght@400;900&display=swap" rel="stylesheet">
 
-:root {
-  --lucky-green: #22c55e;
-  --lemon-bg: #f7fee7;
-  --metallic-pink: #fbcfe8;
-  --silver-line: #cbd5e1;
-  --black-line: #000000;
-}
+    <style>
+      /* 2. 전역 스타일 및 배경색 설정 */
+      body {
+        margin: 0;
+        background-color: #f7fee7; /* 레몬 그린 배경 */
+        overflow-x: hidden;
+      }
 
-body {
-  background-color: var(--lemon-bg);
-  margin: 0;
-  font-family: 'Grandstander', cursive;
-  overflow-x: hidden;
-}
+      /* 3. 클로버 픽셀 패턴 배경 */
+      .bg-clover-pixel {
+        background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 1h2v1h1v1h1v2H7v1H6v1H4V7H3V6H2V4h1V3h1V1z' fill='%2384cc16' opacity='0.08'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+      }
 
-.bg-clover-pixel {
-  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 1h2v1h1v1h1v2H7v1H6v1H4V7H3V6H2V4h1V3h1V1z' fill='%2384cc16' opacity='0.08'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-}
+      /* 4. ARKIV 로고: 블랙 실버 라인 & 3D 효과 */
+      .arkiv-logo-3d {
+        font-family: 'Shrikhand', cursive;
+        background: linear-gradient(to bottom, #ffffff 0%, #dcfce7 45%, #4ade80 50%, #22c55e 55%, #bbf7d0 100%);
+        -webkit-background-clip: text;
+        background-clip: text; /* 표준 속성 추가로 호환성 경고 해결 */
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+        
+        /* 블랙 실버 라인 구현: 여러 겹의 드롭 섀도우 */
+        filter: 
+          drop-shadow(2px 2px 0px #000000) 
+          drop-shadow(-2px -2px 0px #000000)
+          drop-shadow(2px -2px 0px #000000)
+          drop-shadow(-2px 2px 0px #000000)
+          drop-shadow(0px 6px 0px rgba(251, 207, 232, 0.8)); /* 메탈릭 핑크 하단 그림자 */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" class="bg-clover-pixel min-h-screen"></div>
 
-/* 3. ARKIV 로고: 블랙 실버 라인 디자인 */
-.arkiv-logo-3d {
-  font-family: 'Shrikhand', cursive;
-  background: linear-gradient(to bottom, #ffffff 0%, #dcfce7 45%, #4ade80 50%, #22c55e 55%, #bbf7d0 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  
-  /* 블랙 실버 라인 레이어링 */
-  filter: 
-    drop-shadow(2px 2px 0px var(--black-line)) 
-    drop-shadow(-2px -2px 0px var(--black-line))
-    drop-shadow(2px -2px 0px var(--black-line))
-    drop-shadow(-2px 2px 0px var(--black-line))
-    drop-shadow(0px 6px 0px var(--metallic-pink));
-}
-
-.script-overlay {
-  font-family: 'Pacifico', cursive;
-  color: #f97316;
-  text-shadow: 2px 2px 0px #ffffff;
-  z-index: 20;
-}
-
-.lucky-card {
-  @apply bg-white/40 backdrop-blur-md rounded-[4rem] border-[6px] border-[#fbcfe8] shadow-2xl;
-}
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>
