@@ -1,12 +1,12 @@
 // App.tsx 최상단에 이 줄들이 있는지 꼭 확인하세요!
-import { AddPlaceModal } from './src/components/AddPlaceModal';
-import { CurrencyConverter } from './src/components/CurrencyConverter';
+import { AddPlaceModal } from './components/AddPlaceModal';
+import { CurrencyConverter } from './components/CurrencyConverter';
 // ReceiptModal은 이미 내부에 정의되어 있으니 임포트 안 해도 됩니다.
 import React, { useState, useEffect } from 'react';
 import { db } from './src/services/firebase';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { Plane, ArrowRight, Share2, Plus, X, Music, MapPin, Trash2 } from 'lucide-react';
-import DayColumn from './src/components/DayColumn';
+import DayColumn from './components/DayColumn';
 // --- 1. 영수증 모달 (이미지 4번 환율 합산 로직 포함) ---
 const ReceiptModal = ({ places, onClose }: any) => {
   const [totalKRW, setTotalKRW] = useState(0);

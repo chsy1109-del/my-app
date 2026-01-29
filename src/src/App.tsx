@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { db } from './services/firebase'; // Firebase 설정 파일 경로 확인
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { PlaceCard } from './components/PlaceCard';
-import { ReceiptModal } from './components/ReceiptModal';
+import { PlaceCard } from '../components/PlaceCard';
+import { ReceiptModal } from '../components/ReceiptModal';
 
 export default function App() {
   const [places, setPlaces] = useState([]);
