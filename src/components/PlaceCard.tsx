@@ -1,43 +1,79 @@
-import React, { useState } from 'react';
-import { Music, MapPin, Trash2, Camera } from 'lucide-react';
+import React from 'react';
+import { Trash2, MapPin, CheckCircle, Circle, Coins, MessageSquare } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
-export const PlaceCard = ({ place, toggleVisited, updateMemo, removePlace }: any) => {
-  const [isExpanded, setIsExpanded] = useState(true);
+export function PlaceCard({ place, toggleVisited, updateMemo, removePlace }: any) {
+  // 드래그 앤 드롭을 위한 설정
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: place.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   return (
-    <div className="bg-white rounded-[3rem] p-8 border-[4px] border-white shadow-xl transition-all mb-8">
-      <div className="flex justify-between items-start mb-4">
-        <button onClick={() => toggleVisited(place.id)} className={`p-3 rounded-full ${place.visited ? 'bg-green-500 text-white' : 'bg-green-50 text-green-300 border-2 border-green-100 shadow-sm'}`}>✓</button>
-      </div>
-      <div onClick={() => setIsExpanded(!isExpanded)} className="cursor-pointer mb-6 relative">
-        <span className="font-script text-orange-400 text-2xl absolute -top-8 left-0 opacity-80">The Story of...</span>
-        <h3 className="text-3xl font-retro text-slate-800 leading-tight mt-2">{place.name}</h3>
-      </div>
-      {isExpanded && (
-        <div className="space-y-6 animate-in fade-in duration-500">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-[#dcfce7]/40 p-5 rounded-[2.5rem] border-4 border-white shadow-sm">
-              <label className="text-[9px] font-digital text-green-700 uppercase block mb-2 font-bold tracking-widest">Route</label>
-              <input className="w-full bg-transparent text-xs font-bold outline-none" value={place.transport || ''} onChange={(e) => updateMemo(place.id, 'transport', e.target.value)} placeholder="Direct access" />
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group relative bg-white/60 backdrop-blur-sm rounded-[2rem] border-[4px] transition-all duration-300 ${
+        place.visited ? 'border-green-400 shadow-none opacity-80' : 'border-[#fbcfe8] shadow-lg hover:shadow-pink-100'
+      }`}
+    >
+      {/* 상단: 장소 이름 및 체크 버튼 */}
+      <div className="p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1 min-w-0" {...attributes} {...listeners}>
+            <div className="flex items-center gap-2 mb-1">
+              <MapPin size={14} className="text-pink-400" />
+              <span className="text-[10px] font-black uppercase tracking-tighter text-pink-300">LOCATION ARCHIVE</span>
             </div>
-            <div className="bg-[#ffedd5]/40 p-5 rounded-[2.5rem] border-4 border-white shadow-sm">
-              <label className="text-[9px] font-digital text-orange-700 uppercase block mb-2 font-bold tracking-widest">Cost</label>
-              <input className="w-full bg-transparent text-xs font-bold outline-none font-digital" value={place.cost || ''} onChange={(e) => updateMemo(place.id, 'cost', e.target.value)} placeholder="100 yen / 5 usd" />
-            </div>
+            <h3 className="text-2xl font-black italic text-green-700 leading-none truncate uppercase tracking-tighter">
+              {place.name}
+            </h3>
           </div>
-          <div className="bg-[#fce7f3]/40 p-4 rounded-[2rem] border-4 border-white shadow-sm flex items-center gap-4">
-            <Music size={16} className="text-pink-400" />
-            <input className="bg-transparent flex-1 text-xs font-digital outline-none" value={place.musicLink || ''} onChange={(e) => updateMemo(place.id, 'musicLink', e.target.value)} placeholder="Melon/Apple Music URL" />
+          <button 
+            onClick={() => toggleVisited(place.id)}
+            className={`mt-1 transition-colors ${place.visited ? 'text-green-500' : 'text-pink-200 hover:text-pink-400'}`}
+          >
+            {place.visited ? <CheckCircle size={32} weight="fill" /> : <Circle size={32} />}
+          </button>
+        </div>
+
+        {/* 입력 영역: 비용 및 메모 */}
+        <div className="space-y-3">
+          {/* 비용 입력: 여기에 '1750 yen' 등을 적으면 영수증에 합산됩니다 */}
+          <div className="flex items-center gap-3 bg-white/50 rounded-full px-4 py-2 border-2 border-[#fbcfe8]/30">
+            <Coins size={14} className="text-orange-400" />
+            <input
+              placeholder="COST (e.g. 1750 yen)"
+              className="bg-transparent text-xs font-bold outline-none w-full text-zinc-600 uppercase"
+              value={place.cost || ''}
+              onChange={(e) => updateMemo(place.id, 'cost', e.target.value)}
+            />
           </div>
-          <div className="bg-white border-[3px] border-[#fbcfe8] p-6 rounded-[2.5rem] shadow-inner">
-             <textarea className="bg-transparent w-full outline-none text-sm font-bubbly text-slate-600 resize-none" rows={3} value={place.description || ''} onChange={(e) => updateMemo(place.id, 'description', e.target.value)} placeholder="Add your memories here..." />
-          </div>
-          <div className="flex justify-between items-center pt-2">
-            <button className="text-[10px] font-black text-green-500 flex items-center gap-2 uppercase tracking-widest"><MapPin size={12}/> Map Sync</button>
-            <button onClick={() => removePlace(place.id)} className="text-pink-100 hover:text-red-400 transition-colors"><Trash2 size={16} /></button>
+
+          <div className="flex items-start gap-3 bg-white/50 rounded-2xl px-4 py-3 border-2 border-[#fbcfe8]/30">
+            <MessageSquare size={14} className="text-green-400 mt-1" />
+            <textarea
+              placeholder="ADD MEMORIES..."
+              className="bg-transparent text-xs font-bold outline-none w-full h-16 resize-none text-zinc-500 leading-relaxed"
+              value={place.description || ''}
+              onChange={(e) => updateMemo(place.id, 'description', e.target.value)}
+            />
           </div>
         </div>
-      )}
+
+        {/* 하단: 삭제 버튼 */}
+        <div className="mt-4 flex justify-end">
+          <button 
+            onClick={() => removePlace(place.id)}
+            className="p-2 text-zinc-300 hover:text-red-400 transition-colors"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
+}
