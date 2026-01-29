@@ -1,11 +1,11 @@
 /* 1. 폰트 임포트 */
 @import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=Pacifico&family=Grandstander:wght@400;900&display=swap');
 
-/* 2. 전역 스타일 설정 */
 :root {
   --lemon-bg: #f7fee7;
-  --metal-gray: #94a3b8; /* ✅ 메탈 그레이 색상 */
-  --metallic-pink: #fbcfe8;
+  --metal-gray: #94a3b8; /* ✅ 요청하신 메탈 그레이 */
+  --lucky-orange: #f97316;
+  --pink-border: #fbcfe8;
 }
 
 body {
@@ -15,17 +15,22 @@ body {
   overflow-x: hidden;
 }
 
-/* 3. ✅ ARKIV 로고: 요청하신 메탈 그레이 아웃라인 */
+/* 2. 클로버 패턴 배경 */
+.bg-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 1h2v1h1v1h1v2H7v1H6v1H4V7H3V6H2V4h1V3h1V1z' fill='%2384cc16' opacity='0.08'/%3E%3C/svg%3E");
+  min-height: 100vh;
+}
+
+/* 3. ✅ ARKIV 로고: 메탈 그레이 아웃라인 */
 .arkiv-logo-metal {
   font-family: 'Shrikhand', cursive;
-  font-size: 10rem;
   background: linear-gradient(to bottom, #ffffff 0%, #4ade80 50%, #22c55e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
   line-height: 1;
-  /* 메탈 그레이 테두리를 4방향으로 겹쳐서 선명하게 구현 */
+  /* 메탈릭 그레이 테두리 효과 */
   filter: 
     drop-shadow(2px 2px 0px var(--metal-gray)) 
     drop-shadow(-2px -2px 0px var(--metal-gray))
@@ -34,35 +39,20 @@ body {
     drop-shadow(0px 8px 0px rgba(0,0,0,0.1));
 }
 
-/* 4. Lucky 스크립트 오버레이 */
 .lucky-script {
   font-family: 'Pacifico', cursive;
-  color: #f97316;
-  font-size: 5rem;
+  color: var(--lucky-orange);
   text-shadow: 3px 3px 0px #ffffff;
-  position: absolute;
-  top: -3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
 }
 
-/* 5. 픽셀 패턴 배경 */
-.bg-clover-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 1h2v1h1v1h1v2H7v1H6v1H4V7H3V6H2V4h1V3h1V1z' fill='%2384cc16' opacity='0.08'/%3E%3C/svg%3E");
-}
-
-/* 6. 런치 박스 디자인 */
-.launch-container {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
+/* 4. 대시보드 기둥 디자인 */
+.day-column {
   background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(10px);
-  padding: 3rem;
+  border: 6px solid var(--pink-border);
   border-radius: 4rem;
-  border: 8px solid white;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 900px;
+  width: 380px;
+  min-height: 600px;
+  padding: 40px;
+  flex-shrink: 0;
 }
