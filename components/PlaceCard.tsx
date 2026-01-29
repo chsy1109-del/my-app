@@ -1,44 +1,61 @@
 import React, { useState } from 'react';
-import { Music, MapPin, ExternalLink, Trash2 } from 'lucide-react';
+import { Music, MapPin, Trash2, ExternalLink } from 'lucide-react';
 
 export const PlaceCard = ({ place }: any) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // 기본적으로 펼쳐진 상태로 시작 (원하시면 false로 변경)
+  const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="bg-white rounded-[3rem] p-8 border-4 border-white shadow-xl transition-all">
-      <div onClick={() => setIsExpanded(!isExpanded)} className="cursor-pointer">
-        <span className="font-script text-orange-400 text-xl block -mb-2">The Story of...</span>
-        <h3 className="text-3xl font-retro text-slate-800 leading-tight">{place.name}</h3>
+    // 가장 바깥 테두리는 흰색입니다 (이미지 기준)
+    <div className="bg-white rounded-[3rem] p-8 border-[4px] border-white shadow-xl transition-all relative overflow-hidden group hover:border-[#fbcfe8]">
+      
+      {/* 클릭하면 접었다 폈다 할 수 있는 헤더 */}
+      <div onClick={() => setIsExpanded(!isExpanded)} className="cursor-pointer relative z-10">
+        <span className="font-script text-orange-400 text-2xl block -mb-3 opacity-80 relative -left-2">The Story of...</span>
+        <h3 className="text-4xl font-retro text-slate-800 leading-tight break-words">{place.name}</h3>
       </div>
 
       {isExpanded && (
-        <div className="mt-8 space-y-6 animate-in fade-in duration-500">
-          {/* 장소 정보 그리드: Route & Cost */}
+        <div className="mt-8 space-y-5 animate-in fade-in slide-in-from-top-2 duration-500 relative z-10">
+          
+          {/* Route & Cost: 흰색 테두리 */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-green-50 p-4 rounded-3xl border-2 border-white">
-              <label className="text-[8px] font-digital text-green-600 uppercase block mb-1">Route</label>
-              <div className="text-xs font-bold">{place.transport || 'Directly connected'}</div>
+            <div className="bg-[#dcfce7] p-5 rounded-[2rem] border-[3px] border-white shadow-sm">
+              <label className="text-[9px] font-digital text-green-700 uppercase block mb-1 tracking-widest">Route</label>
+              <div className="text-sm font-bubbly font-bold text-green-900">{place.transport || 'Direct access'}</div>
             </div>
-            <div className="bg-orange-50 p-4 rounded-3xl border-2 border-white">
-              <label className="text-[8px] font-digital text-orange-600 uppercase block mb-1">Cost</label>
-              <div className="text-xs font-bold">{place.cost || 'Free admission'}</div>
+            <div className="bg-[#ffedd5] p-5 rounded-[2rem] border-[3px] border-white shadow-sm">
+              <label className="text-[9px] font-digital text-orange-700 uppercase block mb-1 tracking-widest">Cost</label>
+              <div className="text-sm font-bubbly font-bold text-orange-900">{place.cost || 'Free entry'}</div>
             </div>
           </div>
 
-          {/* 뮤직 섹션 */}
-          <div className="bg-pink-50 p-4 rounded-3xl border-2 border-white flex items-center gap-3">
-            <Music size={16} className="text-pink-400" />
-            <span className="text-[10px] flex-1 truncate font-digital">{place.musicLink || 'Apple Music / Melon URL...'}</span>
+          {/* Music: 흰색 테두리 */}
+          <div className="bg-[#fce7f3] p-4 rounded-[2rem] border-[3px] border-white shadow-sm flex items-center gap-4">
+            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-400 shadow-sm">
+               <Music size={18} />
+            </div>
+            <div className="flex-1 min-w-0">
+                 <label className="text-[8px] font-digital text-pink-500 uppercase block tracking-widest">Soundtrack</label>
+                 <div className="text-xs font-bubbly text-pink-900 truncate">{place.musicLink || 'No track linked'}</div>
+            </div>
+            {place.musicLink && <ExternalLink size={14} className="text-pink-400" />}
           </div>
 
-          {/* 메모 섹션 */}
-          <div className="bg-white border-2 border-[#fbcfe8] p-6 rounded-[2rem] text-xs leading-relaxed text-slate-600 italic">
-            {place.description || 'Add your memories here...'}
+          {/* Memo 박스: 여기만 핑크색 메탈 테두리! */}
+          <div className="bg-white border-[3px] border-[#fbcfe8] p-6 rounded-[2.5rem] text-sm leading-relaxed text-slate-600 font-bubbly shadow-sm relative loading-dots relative">
+            {place.description ? place.description : <span className="opacity-50 italic">No memories recorded yet...</span>}
+             <div className="absolute bottom-2 right-4 text-[8px] font-digital text-[#fbcfe8] uppercase tracking-widest opacity-50">FRAGMENT_LOG</div>
           </div>
 
-          <div className="flex justify-between items-center pt-4 border-t border-[#fbcfe8]">
-            <button className="text-[8px] font-black text-green-600 flex items-center gap-1 uppercase tracking-widest"><MapPin size={10}/> Map Sync</button>
-            <button className="text-pink-200 hover:text-red-400 transition-colors"><Trash2 size={16} /></button>
+          {/* 하단 버튼 */}
+          <div className="flex justify-between items-center pt-4 pl-2">
+            <button className="text-[9px] font-black text-green-500/70 flex items-center gap-1 uppercase tracking-[0.2em] hover:text-green-600 transition-colors">
+                <MapPin size={12}/> Map Sync
+            </button>
+            <button className="w-10 h-10 flex items-center justify-center text-pink-200 hover:text-red-400 hover:bg-red-50 rounded-full transition-all">
+                <Trash2 size={18} />
+            </button>
           </div>
         </div>
       )}
