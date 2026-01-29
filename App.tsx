@@ -4,15 +4,19 @@ import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import DayColumn from './components/DayColumn';
 import { AddPlaceModal } from './components/AddPlaceModal';
 import { CurrencyConverter } from './components/CurrencyConverter';
+import { ReceiptModal } from './components/ReceiptModal';
+import { Plane, ArrowRight } from 'lucide-react';
 
 export default function App() {
   const [places, setPlaces] = useState<any[]>([]);
   const [meta, setMeta] = useState<any>(null);
+  const [isLaunched, setIsLaunched] = useState(false);
   const [activeDay, setActiveDay] = useState<number | null>(null);
   const [isCurrencyOpen, setIsCurrencyOpen] = useState(false);
+  const [showReceipt, setShowReceipt] = useState(false);
+  const [tempDest, setTempDest] = useState('');
 
-  // 🔗 공유 기능: URL에 tripId가 있으면 해당 방으로 접속, 없으면 기본값(fukuoka) 사용
-  const tripId = new URLSearchParams(window.location.search).get('tripId') || 'lucky-fukuoka-trip';
+  const tripId = new URLSearchParams(window.location.search).get('tripId') || 'lucky-shared-trip';
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, "trips", tripId), (snapshot) => {
@@ -20,6 +24,8 @@ export default function App() {
         const data = snapshot.data();
         setPlaces(data.places || []);
         setMeta(data.meta || { destination: 'FUKUOKA', duration: 3 });
+        // 로컬 스토리지 등에 저장된 상태가 있다면 시작 페이지 건너뛰기 가능
+        if (data.meta) setIsLaunched(true); 
       }
     });
     return () => unsub();
@@ -29,45 +35,59 @@ export default function App() {
     await setDoc(doc(db, "trips", tripId), { places: newPlaces, meta }, { merge: true });
   };
 
+  // 1. Launch 오프닝 페이지 복원 (image_e4513a.png 디자인)
+  if (!isLaunched) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-clover-pixel">
+        <div className="w-full max-w-5xl flex flex-col items-center gap-8">
+          <div className="relative mb-12">
+            <div className="script-overlay font-script">Lucky</div>
+            <h1 className="text-[10rem] arkiv-logo-3d leading-none">ARKIV</h1>
+          </div>
+          <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-4xl bg-white/60 p-12 rounded-[4rem] border-8 border-white shadow-2xl">
+             <div className="w-40 h-40 rounded-[2.5rem] aircraft-icon-container flex items-center justify-center text-white animate-float"><Plane size={60} /></div>
+             <form onSubmit={e => { e.preventDefault(); setMeta({ destination: tempDest, duration: 3 }); setIsLaunched(true); }} className="flex-1 space-y-6">
+                <input required placeholder="TARGET DESTINATION..." className="w-full bg-transparent border-b-4 border-green-200 py-4 text-3xl font-retro outline-none" value={tempDest} onChange={e => setTempDest(e.target.value)} />
+                <button className="bg-[#4ade80] text-white font-black px-12 py-5 rounded-full text-xl flex items-center gap-2 shadow-lg transition-all">LAUNCH <ArrowRight size={20} /></button>
+             </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col font-bubbly bg-clover-pixel">
-      {/* 🌸 상단 헤더: 메탈릭 핑크 라인 적용 */}
       <header className="px-10 py-5 flex items-center justify-between glass-light sticky top-0 z-[100] border-b-[3px] border-[#fbcfe8]">
         <div className="flex items-center gap-8">
-          <h1 className="text-3xl font-retro arkiv-logo-3d">ARKIV</h1>
+          <h2 className="text-3xl font-retro text-[#22c55e]">ARKIV</h2>
           <div className="border-l-2 border-[#fbcfe8] pl-8 font-retro text-orange-500 text-xl">{meta?.destination}</div>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => setIsCurrencyOpen(true)} className="px-5 py-2 bg-white text-green-600 rounded-full text-[10px] font-black border-2 border-[#fbcfe8] hover:bg-pink-50 transition-all">EXCHANGE</button>
-          <button onClick={() => {
-            const shareUrl = `${window.location.origin}${window.location.pathname}?tripId=${tripId}`;
-            navigator.clipboard.writeText(shareUrl);
-            alert("공유 링크가 복사되었습니다! 친구에게 보내주세요. 🍀");
-          }} className="px-5 py-2 bg-pink-400 text-white rounded-full text-[10px] font-black border-2 border-white shadow-sm hover:bg-pink-500 transition-all">SHARE TRIP +</button>
+          <button onClick={() => setIsCurrencyOpen(true)} className="px-5 py-2 bg-white text-green-600 rounded-full text-[10px] font-black border-2 border-[#fbcfe8]">EXCHANGE</button>
+          <button onClick={() => setShowReceipt(true)} className="px-5 py-2 bg-white text-pink-400 rounded-full text-[10px] font-black border-2 border-[#fbcfe8]">RECEIPT</button>
+          <button onClick={() => navigator.clipboard.writeText(window.location.href)} className="px-5 py-2 bg-pink-400 text-white rounded-full text-[10px] font-black border-2 border-white">SHARE +</button>
         </div>
       </header>
 
-      {/* 🗓️ 메인 타임라인 영역 */}
-      <main className="flex-1 overflow-x-auto p-12 flex items-start gap-12 custom-scrollbar">
+      <main className="flex-1 overflow-x-auto p-12 flex items-start gap-12">
         {[1, 2, 3].map(day => (
           <DayColumn 
             key={day} dayNum={day} 
             places={places.filter(p => p.day === day)} 
             addPlace={(d: any) => setActiveDay(d)}
-            syncPlaces={(updated: any) => syncData(updated)}
+            syncPlaces={(updated: any) => { setPlaces(updated); syncData(updated); }}
           />
         ))}
       </main>
 
-      {/* ➕ 장소 추가 모달 (구글맵 연동) */}
       {activeDay && <AddPlaceModal day={activeDay} onClose={() => setActiveDay(null)} onAdd={(newP: any) => {
         const updated = [...places, { ...newP, id: Date.now(), day: activeDay, photos: [] }];
-        syncData(updated); 
-        setActiveDay(null);
+        syncData(updated); setActiveDay(null);
       }} />}
       
-      {/* 💰 환율계산기 모달 */}
       <CurrencyConverter isOpen={isCurrencyOpen} onClose={() => setIsCurrencyOpen(false)} />
+      {showReceipt && <ReceiptModal places={places} homeCurrency="KRW" onClose={() => setShowReceipt(false)} />}
     </div>
   );
 }
