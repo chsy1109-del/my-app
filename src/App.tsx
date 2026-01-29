@@ -5,7 +5,7 @@ import { Plane, ArrowRight, Share2, Plus, X } from 'lucide-react';
 import DayColumn from './components/DayColumn'; 
 
 export default function App() {
-  // ✅ 모든 변수와 로직은 반드시 이 { 중괄호 } 안에 있어야 에러가 안 납니다!
+  // ✅ 모든 변수와 상태는 이 { } 안에 있어야 에러가 안 납니다!
   const [places, setPlaces] = useState<any[]>([]);
   const [meta, setMeta] = useState<any>(null);
   const [isLaunched, setIsLaunched] = useState(false);
@@ -28,24 +28,23 @@ export default function App() {
     await setDoc(doc(db, "trips", tripId), { places: newP, meta: newM || meta }, { merge: true });
   };
 
-  // 런치 페이지
+  // 1. 런치 페이지 디자인
   if (!isLaunched) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-clover-pixel" style={{backgroundColor: '#f7fee7'}}>
-        <div className="w-full max-w-5xl flex flex-col items-center gap-12 text-center">
-          <div className="relative mb-8">
-            <div className="absolute -top-12 left-1/2 -translate-x-1/2 text-7xl text-orange-500" style={{fontFamily: 'Pacifico'}}>Lucky</div>
-            {/* ✅ 메탈 그레이 아웃라인 적용된 로고 */}
-            <h1 className="text-[10rem] arkiv-logo-metal leading-none">ARKIV</h1>
+      <div className="bg-clover-pattern" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div style={{ textAlign: 'center', zIndex: 1 }}>
+          <div style={{ position: 'relative', marginBottom: '40px' }}>
+            <div className="lucky-script">Lucky</div>
+            <h1 className="arkiv-logo-metal">ARKIV</h1>
           </div>
           
-          <div className="flex flex-col md:flex-row items-center gap-10 w-full max-w-4xl bg-white/40 p-12 rounded-[4rem] border-[8px] border-white shadow-2xl backdrop-blur-md">
-             <div className="w-44 h-44 rounded-[3rem] flex items-center justify-center text-white flex-shrink-0" style={{background: 'linear-gradient(135deg, #84cc16 0%, #fbbf24 100%)'}}>
+          <div className="launch-container">
+             <div style={{ width: '150px', height: '150px', borderRadius: '3rem', background: 'linear-gradient(135deg, #84cc16 0%, #fbbf24 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', flexShrink: 0, boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }}>
                 <Plane size={80} />
              </div>
-             <form onSubmit={e => { e.preventDefault(); const m = { destination: tempDest }; setMeta(m); setIsLaunched(true); syncData(places, m); }} className="flex-1 space-y-8 text-left">
-                <input required placeholder="TARGET DESTINATION..." className="w-full bg-white/80 border-b-4 border-green-200 py-4 px-8 rounded-full text-3xl outline-none" value={tempDest} onChange={e => setTempDest(e.target.value)} />
-                <button className="bg-[#4ade80] text-white font-black px-12 py-5 rounded-full text-xl flex items-center gap-3 shadow-lg active:scale-95 transition-all">LAUNCH <ArrowRight /></button>
+             <form style={{ flex: 1, textAlign: 'left' }} onSubmit={e => { e.preventDefault(); const m = { destination: tempDest }; setMeta(m); setIsLaunched(true); syncData(places, m); }}>
+                <input required placeholder="TARGET DESTINATION..." style={{ width: '100%', background: 'white', border: 'none', borderBottom: '4px solid #bbf7d0', padding: '16px 24px', borderRadius: '50px', fontSize: '2rem', outline: 'none', marginBottom: '20px' }} value={tempDest} onChange={e => setTempDest(e.target.value)} />
+                <button style={{ background: '#4ade80', color: 'white', fontWeight: '900', padding: '16px 40px', borderRadius: '50px', fontSize: '1.2rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>LAUNCH <ArrowRight /></button>
              </form>
           </div>
         </div>
@@ -53,14 +52,14 @@ export default function App() {
     );
   }
 
-  // 메인 대시보드
+  // 2. 메인 대시보드
   return (
-    <div className="min-h-screen flex flex-col bg-clover-pixel" style={{backgroundColor: '#f7fee7'}}>
-      <header className="px-10 py-6 flex items-center justify-between border-b-[3px] border-[#fbcfe8]">
-        <h2 className="text-3xl arkiv-logo-metal cursor-pointer" onClick={() => setIsLaunched(false)}>ARKIV</h2>
-        <div className="text-orange-500 font-bold uppercase tracking-widest">{meta?.destination}</div>
+    <div className="bg-clover-pattern" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <header style={{ padding: '24px 40px', display: 'flex', alignItems: 'center', justifyContent: 'between', borderBottom: '3px solid #fbcfe8' }}>
+        <h2 className="arkiv-logo-metal" style={{ fontSize: '2.5rem', cursor: 'pointer' }} onClick={() => setIsLaunched(false)}>ARKIV</h2>
+        <div style={{ marginLeft: 'auto', color: '#f97316', fontWeight: 'bold', fontSize: '1.2rem' }}>{meta?.destination}</div>
       </header>
-      <main className="flex-1 p-12 overflow-x-auto flex items-start gap-12">
+      <main style={{ flex: 1, padding: '40px', display: 'flex', gap: '40px', overflowX: 'auto' }}>
         <DayColumn dayNum={1} places={places} />
       </main>
     </div>
