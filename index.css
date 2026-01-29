@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-zinc-950 text-stone-200 antialiased selection:bg-rose-500/30;
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  /* 필름 감성 잡지 헤더 스타일 */
+  .magazine-header {
+    @apply font-light tracking-[0.2em] uppercase;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+
+  /* 영수증 종이 질감 */
+  .receipt-paper {
+    background: #f4f1ea;
+    background-image: radial-gradient(#d1d1d1 1px, transparent 0);
+    background-size: 24px 24px;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.05);
+  }
+
+  /* 필름 카드 효과 */
+  .film-card {
+    @apply transition-all duration-700 ease-out;
+  }
+  
+  .film-card:hover {
+    @apply scale-[1.01] shadow-[0_0_40px_rgba(225,29,72,0.15)];
+  }
+}
+
+/* 배경 그리드 제거 및 어두운 감성 추가 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(24, 24, 27, 0) 0%, rgba(9, 9, 11, 1) 100%);
+  pointer-events: none;
+  z-index: 1;
+}

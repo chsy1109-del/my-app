@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { db } from './services/firebase'; // Firebase 설정 파일 경로 확인
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
-import { PlaceCard } from './components/PlaceCard';
-import { ReceiptModal } from './components/ReceiptModal';
+import { PlaceCard } from './components/PlaceCard.tsx';
+import { ReceiptModal } from './components/ReceiptModal.tsx';
 
 export default function App() {
   const [places, setPlaces] = useState([]);
@@ -42,18 +42,31 @@ export default function App() {
 
   return (
     <div className="min-h-screen p-6 md:p-16 max-w-6xl mx-auto">
-      {/* 매거진 스타일 헤더 */}
-      <header className="flex justify-between items-end mb-20 border-b border-white/5 pb-10">
+      {/* 필름 & 매거진 스타일 헤더 */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-end mb-20 border-b border-white/10 pb-12">
         <div>
-          <h1 className="magazine-header text-6xl font-bold uppercase tracking-tighter">Lumina.</h1>
-          <p className="text-[9px] tracking-[0.4em] text-white/20 mt-2">ISSUE NO.04 / COLLABORATIVE ARCHIVE</p>
+          <h1 className="magazine-header text-5xl md:text-7xl font-light tracking-tighter text-stone-200">
+            Arkiv: Fragments of Lumina
+          </h1>
+          <p className="text-[9px] tracking-[0.5em] text-zinc-500 mt-3 uppercase">
+            Archive No. 01 / Fukuoka Fragments
+          </p>
         </div>
-        <div className="flex gap-4">
-          <button onClick={() => setShowReceipt(true)} className="text-[10px] border border-white/20 px-5 py-2 hover:bg-white hover:text-black transition">RECEIPT</button>
-          <button onClick={() => navigator.clipboard.writeText(window.location.href)} className="text-[10px] bg-white text-black px-5 py-2 font-bold tracking-widest">SHARE +</button>
+        <div className="flex gap-4 mt-8 md:mt-0">
+          <button 
+            onClick={() => setShowReceipt(true)} 
+            className="text-[10px] tracking-widest border border-stone-800 px-6 py-3 hover:bg-stone-100 hover:text-black transition-all duration-500 uppercase"
+          >
+            Receipt
+          </button>
+          <button 
+            onClick={() => navigator.clipboard.writeText(window.location.href)} 
+            className="text-[10px] tracking-widest bg-stone-200 text-black px-6 py-3 font-bold transition-all duration-500 uppercase"
+          >
+            Share +
+          </button>
         </div>
       </header>
-
       {/* 💰 여행 시작 통화 설정 */}
       <section className="mb-16 grid grid-cols-2 gap-8 p-6 bg-white/5 border border-white/5 rounded-sm">
         <div className="space-y-2">
